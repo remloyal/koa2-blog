@@ -8,6 +8,8 @@ import http from 'http';
 import https from 'https';
 import staticState from 'koa-static';
 import path from 'path';
+import cors from 'koa2-cors';
+
 import { dbtest } from './entity/db';
 
 import { koaSwagger } from 'koa2-swagger-ui';
@@ -21,9 +23,17 @@ app.context.log4js = log4js;
 // 注册koa-static中间件
 app.use(staticState(path.join(__dirname, '../public')));
 
-app.use(koaBody());
-app.use(reponseBody());
+app.use(
+  koaBody({
+    multipart: true,
+    formidable: {
+      maxFileSize: 2000 * 1024 * 1024, // 设置上传文件大小最大限制，默认2M
+    },
+  })
+);
 
+app.use(reponseBody());
+app.use(cors());
 // logger  中间件
 app.use(async (ctx, next) => {
   const start = Date.now();

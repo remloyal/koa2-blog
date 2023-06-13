@@ -70,7 +70,7 @@ export default class ArticleController {
         article_id: record.article_id,
       },
     });
-    record.updateAt = new Date();
+    // record.updateAt = new Date();
     if (data) {
       await data.update({ ...record });
       await ctx.success(null, '数据更新成功');

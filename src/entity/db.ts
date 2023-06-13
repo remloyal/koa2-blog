@@ -1,8 +1,12 @@
 import { Sequelize } from 'sequelize';
 
 import * as log4js from '../utils/log';
+import { FIXED_KEY } from '../config/config';
 
-const sequelize = new Sequelize('mysql://root:d8K9vFR7ll5LqGBINwaF@containers-us-west-82.railway.app:7500/railway', {
+const sqlUrl = FIXED_KEY.sql.sqlUrl != '' || null ? FIXED_KEY.sql.sqlUrl : `${FIXED_KEY.sql.type}://${FIXED_KEY.sql.username}:${FIXED_KEY.sql.password}@${FIXED_KEY.sql.host}:${FIXED_KEY.sql.port}/${FIXED_KEY.sql.database}`
+console.log(sqlUrl);
+
+const sequelize = new Sequelize(sqlUrl, {
   timezone: '+08:00',
   logging: (manage) => {
     log4js.db(manage);
