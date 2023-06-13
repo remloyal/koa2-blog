@@ -9,15 +9,14 @@ publicRouter.get('/', (ctx: Context) => {
   ctx.body = 'This is home';
 });
 
-require('./articleRouter')(publicRouter)
-
-publicRouter.get('/users', UserController.listUsers);
+require('./articleRouter')(publicRouter);
+require('./articleSortRouter')(publicRouter);
 
 // --------------私有路由(需token校验)----------------------
 const privateRouter = new Router();
-privateRouter.prefix('/manage');
-privateRouter.post('/', (ctx: Context) => {
-  ctx.body = 'This is manage';
+privateRouter.prefix('/private');
+privateRouter.get('/', (ctx: Context) => {
+  ctx.body = 'This is private';
 });
 
 export { publicRouter, privateRouter };

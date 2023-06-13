@@ -1,6 +1,8 @@
 import log4js from 'log4js';
 import path from 'path';
 import { Context } from 'koa';
+import dayjs from 'dayjs';
+import { getClientIp } from './util';
 
 const levels = {
   trace: log4js.levels.TRACE,
@@ -11,8 +13,11 @@ const levels = {
   fatal: log4js.levels.FATAL,
 };
 
+const logSize = 10485760; //10m
+
 log4js.addLayout('json', function (config) {
   return function (logEvent) {
+    logEvent.startTime = dayjs(logEvent.startTime).format('YYYY-MM-DD HH:mm:ss:SSS') as unknown as Date;
     return JSON.stringify(logEvent) + config.separator;
   };
 });
@@ -27,7 +32,7 @@ log4js.configure({
       pattern: 'yyyy-MM-dd.log',
       alwaysIncludePattern: true,
       layout: { type: 'json', separator: ',' },
-      maxLogSize: 104800,
+      maxLogSize: logSize,
       backups: 100,
     },
     error: {
@@ -36,7 +41,7 @@ log4js.configure({
       pattern: 'yyyy-MM-dd.log',
       alwaysIncludePattern: true, // 设置文件名称为 filename + pattern
       layout: { type: 'json', separator: ',' },
-      maxLogSize: 104800,
+      maxLogSize: logSize,
       backups: 100,
     },
     database: {
@@ -45,7 +50,7 @@ log4js.configure({
       pattern: 'yyyy-MM-dd.log',
       alwaysIncludePattern: true, // 设置文件名称为 filename + pattern
       layout: { type: 'json', separator: ',' },
-      maxLogSize: 104800,
+      maxLogSize: logSize,
       backups: 100,
     },
     application: {
@@ -55,17 +60,17 @@ log4js.configure({
       encoding: 'utf-8',
       filename: path.join('logs/', 'application/application'),
       layout: { type: 'json', separator: ',' },
-      maxLogSize: 104800,
+      maxLogSize: logSize,
       backups: 100,
     },
     // 响应日志
     response: {
       type: 'dateFile',
-      category: 'resLogger',
+      // category: 'resLogger',
       filename: path.join('logs/', 'responses/response'),
       pattern: 'yyyy-MM-dd.log', //日志输出模式
       alwaysIncludePattern: true,
-      maxLogSize: 104800,
+      maxLogSize: logSize,
       backups: 100,
       layout: { type: 'json', separator: ',' },
     },
@@ -84,7 +89,7 @@ log4js.configure({
       level: 'error',
     },
     database: {
-      appenders: ['database', 'console'],
+      appenders: ['database'],
       level: 'info',
     },
     response: {
@@ -122,12 +127,11 @@ export const info = (content: string) => {
  * 日志输出 数据库
  * @param { string } content
  */
- export const db = (content: string) => {
+export const db = (content: string) => {
   let logger = log4js.getLogger('database');
   logger.level = levels.info;
   logger.info(content);
 };
-
 
 /**
  * 日志输出 level为error
@@ -142,29 +146,41 @@ export const error = (content: string) => {
 export { log4js };
 
 const formatError = (ctx: { request?: any; state?: any; method?: any; url?: any }, err: any) => {
-  const { method, url } = ctx;
-  let body = ctx.request.body;
-  const user = ctx.state.user;
-  return { method, url, body, user, err };
+  // const { method, url } = ctx;
+  // let body = ctx.request.body;
+  // const user = ctx.state.user;
+
+  return { ctx, err };
 };
 
-const formatRes = (ctx: { request: any; state?: any; method?: any; url?: any; response?: any }, costTime: any) => {
+const formatRes = (ctx: Context, costTime: any) => {
   const {
     method,
     url,
-    response: {
-      status,
-      message,
-
-      // body: { success },
-    },
+    body,
+    response: { status, message },
     request: {
       header: { authorization },
     },
   } = ctx;
-  let body = ctx.request.body;
+
   const user = ctx.state.user;
-  return { method, url, user, body, costTime, authorization, response: { status, message } };
+  const headers = {
+    userAgent: ctx.header['user-agent'],
+    host: ctx.header.host,
+  };
+  const ip = getClientIp(ctx);
+  return {
+    method,
+    url,
+    ip,
+    user,
+    headers,
+    body,
+    costTime: `${costTime}ms`,
+    authorization,
+    response: { status, message },
+  };
 };
 
 let errorLogger = log4js.getLogger('error');

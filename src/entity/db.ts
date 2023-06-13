@@ -17,11 +17,11 @@ export const dbtest = () => {
       log4js.db('数据库连接成功');
       // 创建模型
       sequelize.sync({ force: false, alter: true });
-      // console.log('数据库连接成功');
+      console.log('数据库连接成功');
     })
     .catch((err: any) => {
       // 数据库连接失败时打印输出
-      log4js.db(err);
+      log4js.db(`数据库连接失败====> ${err}`);
       console.error('数据库连接失败====>', err);
       throw err;
     });
