@@ -11,6 +11,7 @@ publicRouter.get('/', (ctx: Context) => {
 
 require('./articleRouter')(publicRouter);
 require('./articleSortRouter')(publicRouter);
+require('./resourceRouter')(publicRouter);
 
 // --------------私有路由(需token校验)----------------------
 const privateRouter = new Router();

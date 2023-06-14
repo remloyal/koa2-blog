@@ -11,28 +11,28 @@ export const reponseBody = (option = {}) => {
       ctx.body = {
         data: data ?? null,
         code: 200,
-        message: message || '数据请求成功',
+        msg: message || '数据请求成功',
       };
     };
 
     ctx.fail = (message?: string) => {
       ctx.body = {
         code: 400,
-        message: message || '数据请求失败',
+        msg: message || '数据请求失败',
       };
     };
 
     ctx.error = (message?: string) => {
       ctx.body = {
         code: 500,
-        message: message || '服务器异常',
+        msg: message || '服务器异常',
       };
     };
 
     ctx.error = (count: number, row: any, size: number, page: any) => {
       ctx.body = {
         code: 200,
-        message: '成功',
+        msg: '成功',
         data: {
           current: page,
           pages: Math.ceil(count / size),

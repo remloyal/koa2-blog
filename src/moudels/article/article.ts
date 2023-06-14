@@ -1,12 +1,13 @@
 import sequelize from '../../entity/db';
 import { Model, DataTypes } from 'sequelize';
+import { randomStr } from '../../utils/util';
 
 const { STRING, INTEGER, DATE, BOOLEAN, UUIDV4 } = DataTypes; // 获取数据类型
 const Article = sequelize.define(
   'rem_article',
   {
     id: { type: INTEGER, primaryKey: true, autoIncrement: true },
-    article_id: { type: STRING, defaultValue: UUIDV4, allowNull: true },
+    article_id: { type: STRING, defaultValue: randomStr(), allowNull: true },
     //   标题
     title: { type: STRING, allowNull: false },
 

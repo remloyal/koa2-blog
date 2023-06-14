@@ -3,7 +3,10 @@ import { Sequelize } from 'sequelize';
 import * as log4js from '../utils/log';
 import { FIXED_KEY } from '../config/config';
 
-const sqlUrl = FIXED_KEY.sql.sqlUrl != '' || null ? FIXED_KEY.sql.sqlUrl : `${FIXED_KEY.sql.type}://${FIXED_KEY.sql.username}:${FIXED_KEY.sql.password}@${FIXED_KEY.sql.host}:${FIXED_KEY.sql.port}/${FIXED_KEY.sql.database}`
+const sqlUrl =
+  FIXED_KEY.sql.sqlUrl != '' || null
+    ? FIXED_KEY.sql.sqlUrl
+    : `${FIXED_KEY.sql.type}://${FIXED_KEY.sql.username}:${FIXED_KEY.sql.password}@${FIXED_KEY.sql.host}:${FIXED_KEY.sql.port}/${FIXED_KEY.sql.database}`;
 console.log(sqlUrl);
 
 const sequelize = new Sequelize(sqlUrl, {
@@ -20,7 +23,15 @@ export const dbtest = () => {
     .then(() => {
       log4js.db('数据库连接成功');
       // 创建模型
-      sequelize.sync({ force: false, alter: true });
+      sequelize
+        .sync({ force: false, alter: true })
+        .then(() => {
+          console.log('数据库同步成功');
+        })
+        .catch((err) => {
+          log4js.db(`数据库同步成功====> ${err}`);
+          console.error('数据库同步失败====>', err);
+        });
       console.log('数据库连接成功');
     })
     .catch((err: any) => {
