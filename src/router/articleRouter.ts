@@ -3,7 +3,7 @@ import Router from 'koa-router';
 import ArticleController from '../controllers/article';
 import Product from '../moudels/Product';
 
-module.exports = (router: Router) => {
+export const articleRouter = (router: Router) => {
   // const { controller, router } = app;
 
   /**
@@ -15,9 +15,9 @@ module.exports = (router: Router) => {
    *       200:
    *         description: Returns a mysterious string.
    */
-   router.get("/allArticle", ArticleController.allArticle);
-   
-   /**
+  router.get('/allArticle', ArticleController.allArticle);
+
+  /**
    * @openapi
    * /getArticle:
    *   get:
@@ -26,9 +26,9 @@ module.exports = (router: Router) => {
    *       200:
    *         description: Returns a mysterious string.
    */
-   router.get("/getArticle", ArticleController.getArticle);
-   router.post("/createArticle", ArticleController.createArticle);
-   router.get("/deleteArticle", ArticleController.deleteArticle);
-   router.post("/updateArticle", ArticleController.updateArticle);
-   router.post("/getArticlePage", ArticleController.getArticlePage);
-}
+  router.get('/getArticle', ArticleController.getArticle);
+  router.post('/createArticle', ArticleController.createArticle);
+  router.get('/deleteArticle', ArticleController.deleteArticle);
+  router.post('/updateArticle', ArticleController.updateArticle);
+  router.post('/getArticlePage', ArticleController.getArticlePage);
+};

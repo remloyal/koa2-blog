@@ -3,6 +3,6 @@
 import Router from 'koa-router';
 import { ResourceController,  } from '../controllers/resource';
 
-module.exports = (router: Router) => {
+export const resourceRouter = (router: Router) => {
   router.post('/upload', ResourceController.upload);
 };

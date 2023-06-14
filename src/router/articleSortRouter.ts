@@ -1,7 +1,7 @@
 import Router from 'koa-router';
 import ArticleSortController from '../controllers/articleSort';
 
-module.exports = (router: Router) => {
+export const articleSortRouter = (router: Router) => {
   /**
    * @openapi
    * /private/allSort:

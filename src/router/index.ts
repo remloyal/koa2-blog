@@ -1,17 +1,26 @@
 import { Context } from 'koa';
 import Router from 'koa-router';
-import UserController from '../controllers/user';
+import { articleRouter } from './articleRouter';
+import { articleSortRouter } from './articleSortRouter';
+import { resourceRouter } from './resourceRouter';
 
 // -------------公共路由(无需token校验)-----------------------
+
 const publicRouter = new Router();
 publicRouter.prefix('/');
 publicRouter.get('/', (ctx: Context) => {
   ctx.body = 'This is home';
 });
 
-require('./articleRouter')(publicRouter);
-require('./articleSortRouter')(publicRouter);
-require('./resourceRouter')(publicRouter);
+const routers = [
+  articleRouter, 
+  articleSortRouter, 
+  resourceRouter
+];
+
+for (let index = 0; index < routers.length; index++) {
+  routers[index](publicRouter);
+}
 
 // --------------私有路由(需token校验)----------------------
 const privateRouter = new Router();
