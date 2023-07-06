@@ -2,7 +2,10 @@ import { Context } from 'koa';
 import fs from 'fs';
 import path from 'path';
 import { dateFormart, randomStr } from '../utils/util';
-import FileControl from '../moudels/resources/resource';
+import { FileControl, FileControlAttributes } from '../moudels/resources/resource';
+import os from 'os';
+import { Model } from 'sequelize';
+const mime = require('mime-types');
 
 type filesitemtype = {
   filepath: string;
@@ -39,8 +42,6 @@ export class ResourceController {
       for (let index = 0; index < file.files.length; index++) {
         const item: filesitemtype = file.files[index];
         const { filepath, size, mimetype, newFilename, originalFilename } = item;
-        const basename = path.basename(filepath);
-        const url = `${ctx.origin}/uploads/${basename}`;
         const filePath = await saveFileThis(item);
         const [name, suffix] = await handleSuffix(originalFilename);
         // files.push({ url, size, mimetype, newFilename, originalFilename, filePath });
@@ -74,6 +75,53 @@ export class ResourceController {
         msg: '上传成功！',
       };
     }
+  }
+
+  // 获取单个文件
+  public static async resource(ctx: Context) {
+    const id: string = ctx.query.url as string;
+    let file = null;
+    let filePath = path.join(__dirname, '../assetc/default.png'); //默认图片地址;
+    let mimeType = mime.lookup(filePath); //读取图片文件类型
+    try {
+      const fileData: Model<FileControlAttributes, {}> | null = await FileControl.findOne({ where: { file_id: id } });
+      const data: FileControlAttributes | null = fileData ? fileData.get() : null;
+      if (data != null) {
+        const lastDir = path.join(__dirname, '../..', `public${data.flie_path}`);
+        file = fs.readFileSync(lastDir); //读取文件
+        ctx.set('content-type', data.type); //设置返回类型
+      } else {
+        file = fs.readFileSync(filePath); //读取文件
+        ctx.set('content-type', mimeType); //设置返回类型
+      }
+    } catch (error) {
+      //如果服务器不存在请求的图片，返回默认图片
+      file = fs.readFileSync(filePath); //读取文件
+      ctx.set('content-type', mimeType); //设置返回类型
+    }
+    ctx.body = file; //返回资源
+  }
+
+  // 获取系统信息
+  public static async info(ctx: Context) {
+    const cpuInfo = os.cpus();
+    const totalmem = os.totalmem();
+    const arch = os.arch();
+    // 获取内存信息
+    const totalMemory = os.totalmem();
+    const freeMemory = os.freemem();
+    // 获取系统类型
+    const systemType = os.type();
+    const deviceInfo = {
+      // cpuInfo,
+      totalMemory,
+      freeMemory,
+      systemType,
+      totalmem,
+      arch,
+      type: os.type(),
+    };
+    ctx.body = deviceInfo;
   }
 }
 
@@ -126,16 +174,17 @@ function validateFileType(file: any) {
 /**
  * @description 抽离公共方法 存储单文件
  */
-function saveFileThis(file: any) {
+async function saveFileThis(file: any) {
   // @ts-ignore
   const reader = fs.createReadStream(file.filepath); // 创建可读流
   // @ts-ignore
   const ext = path.extname(file.originalFilename);
+  let [name, mimeType] = await handleSuffix(file.originalFilename);
   // 最终要保存到的文件夹目录
   const yyyyMMdd = dateFormart('yyyyMMdd'); // 目录： 年月日
-  const lastDir = path.join(__dirname, '../..', `public/upload/${yyyyMMdd}`);
-  checkDirExist(lastDir); // 检查文件夹是否存在如果不存在则新建文件夹
-  const filePath = `/upload/${yyyyMMdd}/` + randomStr() + ext;
+  const lastDir = path.join(__dirname, '../..', `public/upload/${mimeType}/${yyyyMMdd}`);
+  checkDirExist(lastDir); //code 检查文件夹是否存在如果不存在则新建文件夹
+  const filePath = `/upload/${mimeType}/${yyyyMMdd}/` + randomStr() + ext;
   const writer = fs.createWriteStream('public' + filePath); // 创建可写流
   reader.pipe(writer); // 可读流通过管道写入可写流
   return filePath;

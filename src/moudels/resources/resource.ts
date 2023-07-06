@@ -4,7 +4,7 @@ import { randomStr } from '../../utils/util';
 const { STRING, INTEGER, UUIDV4 } = DataTypes; // 获取数据类型
 
 // 资源管理表
-const FileControl = sequelize.define(
+export const FileControl = sequelize.define(
   'rem_file_control',
   {
     id: {
@@ -45,4 +45,10 @@ const FileControl = sequelize.define(
   }
 );
 
-export default FileControl;
+export interface FileControlAttributes {
+  file_id: string;
+  name: string;
+  type: string;
+  suffix_name: string;
+  flie_path: string;
+}
