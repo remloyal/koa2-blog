@@ -18,6 +18,14 @@ const logSize = 10485760; //10m
 log4js.addLayout('json', function (config) {
   return function (logEvent) {
     logEvent.startTime = dayjs(logEvent.startTime).format('YYYY-MM-DD HH:mm:ss:SSS') as unknown as Date;
+    if (logEvent.data[0].url) {
+      const { url } = logEvent.data[0];
+      console.log(url.indexOf('resource'));
+      
+      if (url.indexOf('resource') != -1) {
+        logEvent.data[0].body = null;
+      }
+    }
     return JSON.stringify(logEvent) + config.separator;
   };
 });
@@ -71,6 +79,7 @@ log4js.configure({
       pattern: 'yyyy-MM-dd.log', //日志输出模式
       alwaysIncludePattern: true,
       maxLogSize: logSize,
+      encoding: 'utf-8',
       backups: 100,
       layout: { type: 'json', separator: ',' },
     },

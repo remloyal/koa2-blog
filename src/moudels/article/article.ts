@@ -2,17 +2,18 @@ import sequelize from '../../entity/db';
 import { Model, DataTypes } from 'sequelize';
 import { randomStr } from '../../utils/util';
 
-const { STRING, INTEGER, DATE, BOOLEAN, UUIDV4 } = DataTypes; // 获取数据类型
+const { STRING, INTEGER, DATE, BOOLEAN, UUIDV4,TEXT } = DataTypes; // 获取数据类型
 const Article = sequelize.define(
   'rem_article',
   {
     id: { type: INTEGER, primaryKey: true, autoIncrement: true },
     article_id: { type: STRING, defaultValue: randomStr(), allowNull: true },
+    name:{ type: STRING, allowNull: true },
     //   标题
     title: { type: STRING, allowNull: false },
 
     //   内容
-    content: { type: STRING(3000), allowNull: false },
+    content: { type: TEXT, allowNull: true },
     //   标签
     type: { type: STRING(100), allowNull: false },
     //   描述description
