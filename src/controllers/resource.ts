@@ -181,10 +181,10 @@ async function saveFileThis(file: any) {
   const ext = path.extname(file.originalFilename);
   let [name, mimeType] = await handleSuffix(file.originalFilename);
   // 最终要保存到的文件夹目录
-  const yyyyMMdd = dateFormart('yyyyMMdd'); // 目录： 年月日
-  const lastDir = path.join(__dirname, '../..', `public/upload/${mimeType}/${yyyyMMdd}`);
+  const yyyyMM = dateFormart('yyyyMM'); // 目录： 年月日
+  const lastDir = path.join(__dirname, '../..', `public/upload/${mimeType}/${yyyyMM}`);
   checkDirExist(lastDir); //code 检查文件夹是否存在如果不存在则新建文件夹
-  const filePath = `/upload/${mimeType}/${yyyyMMdd}/` + randomStr() + ext;
+  const filePath = `/upload/${mimeType}/${yyyyMM}/` + randomStr(8,yyyyMM) + ext;
   const writer = fs.createWriteStream('public' + filePath); // 创建可写流
   reader.pipe(writer); // 可读流通过管道写入可写流
   return filePath;

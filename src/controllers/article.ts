@@ -39,8 +39,11 @@ export default class ArticleController {
   //添加
   public static async createArticle(ctx: Context) {
     const record = ctx.request.body;
+
     const data = await Article.create({
-      ...record,
+      article_title:record.title,
+      article_content:record.content,
+      category_id:record.category,
     });
 
     

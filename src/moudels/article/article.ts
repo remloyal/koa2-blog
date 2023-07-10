@@ -15,12 +15,17 @@ const Article = sequelize.define(
       allowNull: false,
       comment: "分类id 不能为空",
     },
-    //   内容
     article_content: {
       type: DataTypes.TEXT,
       allowNull: false,
       comment: "文章内容",
     },
+    article_description: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+      comment: "文章描述",
+    },
+
     article_cover: {
       type: DataTypes.STRING(1234),
       allowNull: true,

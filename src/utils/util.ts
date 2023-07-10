@@ -36,14 +36,14 @@ export const getClientIp = (req: Context) => {
  * @description 生成随机字符串给文件命名
  * @returns {string}
  */
-export function randomStr(length: number = 16): string {
+export function randomStr(length: number = 16, text: string = ''): string {
   let result = '';
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   const charactersLength = characters.length;
   for (let i = 0; i < length; i++) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
   }
-  return result;
+  return result + text;
 }
 
 /* 时间转换成日期格式 */

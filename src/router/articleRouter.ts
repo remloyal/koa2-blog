@@ -1,7 +1,6 @@
 import { Context } from 'koa';
 import Router from 'koa-router';
 import ArticleController from '../controllers/article';
-import Product from '../moudels/Product';
 
 export const articleRouter = (router: Router) => {
   // const { controller, router } = app;
