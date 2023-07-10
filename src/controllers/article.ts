@@ -43,6 +43,8 @@ export default class ArticleController {
       ...record,
     });
 
+    
+
     ctx.success(data);
   }
 

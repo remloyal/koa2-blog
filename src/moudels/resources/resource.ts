@@ -1,6 +1,7 @@
 import sequelize from '../../entity/db';
 import { Model, DataTypes } from 'sequelize';
 import { randomStr } from '../../utils/util';
+import dayjs from 'dayjs';
 const { STRING, INTEGER, UUIDV4 } = DataTypes; // 获取数据类型
 
 // 资源管理表
@@ -37,6 +38,18 @@ export const FileControl = sequelize.define(
     flie_path: {
       type: DataTypes.STRING,
       comment: '资源路径',
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      get() {
+        return dayjs(this.getDataValue("createdAt")).format("YYYY-MM-DD HH:mm:ss")
+      },
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      get() {
+        return dayjs(this.getDataValue("updatedAt")).format("YYYY-MM-DD HH:mm:ss")
+      },
     },
   },
   {
