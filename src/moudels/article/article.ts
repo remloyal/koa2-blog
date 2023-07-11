@@ -68,6 +68,11 @@ const Article = sequelize.define(
       defaultValue: 0,
       comment: "文章阅读时长",
     },
+    file_path:{
+      type: DataTypes.STRING,
+      allowNull: true,
+      comment: "文章路径",
+    },
     createdAt: {
       type: DataTypes.DATE,
       get() {

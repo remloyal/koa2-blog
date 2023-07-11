@@ -1,5 +1,10 @@
 import { Context } from 'koa';
+import sequelize from '../entity/db';
 import Article from '../moudels/article/article';
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
+import { dateFormart, randomStr } from '../utils/util';
 
 // 文章分类
 export default class ArticleController {
@@ -38,17 +43,34 @@ export default class ArticleController {
 
   //添加
   public static async createArticle(ctx: Context) {
-    const record = ctx.request.body;
+    const t = await sequelize.transaction();
+    try {
+      const record = ctx.request.body;
+      // 创建本地md文件
+      const yyyyMM = dateFormart('yyyyMM'); // 目录： 年月日
+      const lastDir = path.join(__dirname, '../..', `public/markdown/${yyyyMM}`);
+      await checkDirExist(lastDir); //code 检查文件夹是否存在如果不存在则新建文件夹
+      const route = `/markdown/${yyyyMM}/` + record.name + '.md';
 
-    const data = await Article.create({
-      article_title:record.title,
-      article_content:record.content,
-      category_id:record.category,
-    });
-
-    
-
-    ctx.success(data);
+      const filePath = path.join(__dirname, '../..', `public${route}`);
+      const state = await createMd(filePath, JSON.parse(record.content));
+      if (state == true) {
+        const data = await Article.create({
+          article_title: record.title,
+          article_content: record.content,
+          category_id: record.category,
+          file_path: route,
+        });
+        await t.commit();
+        ctx.success(data);
+      } else {
+        await t.rollback();
+        ctx.error('文件添加失败');
+      }
+    } catch (error) {
+      await t.rollback();
+      ctx.error(error);
+    }
   }
 
   // 删除
@@ -83,4 +105,38 @@ export default class ArticleController {
       await ctx.success(data, '数据更新失败');
     }
   }
+}
+
+/**
+ * @description 判断文件夹是否存在 如果不存在则创建文件夹
+ */
+function checkDirExist(p: string) {
+  if (!fs.existsSync(p)) {
+    fs.mkdirSync(p, { recursive: true }); // 递归创建子文件夹
+  }
+}
+/**
+ * @description 创建md文件
+ */
+
+async function createMd(filePath: fs.PathOrFileDescriptor, content: string | NodeJS.ArrayBufferView) {
+  try {
+    const data = await createFile(filePath, content);
+    return data;
+  } catch (err) {
+    console.error(err);
+    return err;
+  }
+}
+
+async function createFile(filePath: fs.PathOrFileDescriptor, content: string | NodeJS.ArrayBufferView) {
+  return new Promise((resolve, reject) => {
+    fs.writeFile(filePath, content, (err) => {
+      if (err) {
+        console.error(err);
+        reject(err);
+      }
+      resolve(true);
+    });
+  });
 }

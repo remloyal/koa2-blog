@@ -31,7 +31,7 @@ export const reponseBody = (option = {}) => {
 
     ctx.error = (count: number, row: any, size: number, page: any) => {
       ctx.body = {
-        code: 200,
+        code: 403,
         msg: '成功',
         data: {
           current: page,

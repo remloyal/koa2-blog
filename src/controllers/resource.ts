@@ -5,6 +5,7 @@ import { dateFormart, randomStr } from '../utils/util';
 import { FileControl, FileControlAttributes } from '../moudels/resources/resource';
 import os from 'os';
 import { Model } from 'sequelize';
+import sequelize from '../entity/db';
 const mime = require('mime-types');
 
 type filesitemtype = {
@@ -33,47 +34,54 @@ type fileData = {
 
 // 资源管理
 export class ResourceController {
-  // 获取全部
+  // 上传文件
   public static async upload(ctx: Context) {
     const file: any = ctx.request.files;
-    if (file.files instanceof Array) {
-      // let files: Array<filestype> = [];
-      const createData: Array<fileData> = [];
-      for (let index = 0; index < file.files.length; index++) {
-        const item: filesitemtype = file.files[index];
-        const { filepath, size, mimetype, newFilename, originalFilename } = item;
-        const filePath = await saveFileThis(item);
-        const [name, suffix] = await handleSuffix(originalFilename);
-        // files.push({ url, size, mimetype, newFilename, originalFilename, filePath });
-        createData.push({
+    const t = await sequelize.transaction();
+    try {
+      if (file.files instanceof Array) {
+        // let files: Array<filestype> = [];
+        const createData: Array<fileData> = [];
+        for (let index = 0; index < file.files.length; index++) {
+          const item: filesitemtype = file.files[index];
+          const { filepath, size, mimetype, newFilename, originalFilename } = item;
+          const filePath = await saveFileThis(item);
+          const [name, suffix] = await handleSuffix(originalFilename);
+          // files.push({ url, size, mimetype, newFilename, originalFilename, filePath });
+          createData.push({
+            name: name,
+            type: mimetype,
+            flie_path: filePath,
+            suffix_name: suffix,
+          });
+        }
+        const data = await FileControl.bulkCreate(createData);
+        await t.commit();
+        ctx.body = {
+          start: 200,
+          data: data,
+          msg: '上传成功！',
+        };
+      } else {
+        // let basename = path.basename(file.files.filepath);
+        const filePath = await saveFileThis(file.files);
+        const [name, suffix] = await handleSuffix(file.files.originalFilename);
+        const data = await FileControl.create({
           name: name,
-          type: mimetype,
+          type: file.files.mimetype,
           flie_path: filePath,
           suffix_name: suffix,
         });
+        await t.commit();
+        ctx.body = {
+          start: 200,
+          data: data,
+          msg: '上传成功！',
+        };
       }
-      const data = await FileControl.bulkCreate(createData);
-      ctx.body = {
-        start: 200,
-        data: data,
-        msg: '上传成功！',
-      };
-    } else {
-      // let basename = path.basename(file.files.filepath);
-      const filePath = await saveFileThis(file.files);
-      const [name, suffix] = await handleSuffix(file.files.originalFilename);
-      const data = await FileControl.create({
-        name: name,
-        type: file.files.mimetype,
-        flie_path: filePath,
-        suffix_name: suffix,
-      });
-
-      ctx.body = {
-        start: 200,
-        data: data,
-        msg: '上传成功！',
-      };
+    } catch (error) {
+      await t.rollback();
+      ctx.error(error);
     }
   }
 
@@ -184,7 +192,7 @@ async function saveFileThis(file: any) {
   const yyyyMM = dateFormart('yyyyMM'); // 目录： 年月日
   const lastDir = path.join(__dirname, '../..', `public/upload/${mimeType}/${yyyyMM}`);
   checkDirExist(lastDir); //code 检查文件夹是否存在如果不存在则新建文件夹
-  const filePath = `/upload/${mimeType}/${yyyyMM}/` + randomStr(8,yyyyMM) + ext;
+  const filePath = `/upload/${mimeType}/${yyyyMM}/` + randomStr(8, yyyyMM) + ext;
   const writer = fs.createWriteStream('public' + filePath); // 创建可写流
   reader.pipe(writer); // 可读流通过管道写入可写流
   return filePath;
