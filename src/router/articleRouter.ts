@@ -1,8 +1,10 @@
 import { Context } from 'koa';
 import Router from 'koa-router';
-import ArticleController from '../controllers/article';
+import ArticleController from '../controllers/article/article';
+import ArticleLableController from '../controllers/article/articleLable';
+import ArticleSortController from '../controllers/article/articleSort';
 
-export const articleRouter = (router: Router) => {
+export const articleRouter = (router: Router,privateRouter:Router) => {
   // const { controller, router } = app;
 
   /**
@@ -30,4 +32,13 @@ export const articleRouter = (router: Router) => {
   router.get('/deleteArticle', ArticleController.deleteArticle);
   router.post('/updateArticle', ArticleController.updateArticle);
   router.post('/getArticlePage', ArticleController.getArticlePage);
+
+  // 文章分类
+  router.get('/allSort', ArticleSortController.allSort);
+  router.post('/create', ArticleSortController.createSort);
+  router.get('/deleteSort', ArticleSortController.deleteSort);
+  router.post('/updateSort', ArticleSortController.updateSort);
+
+  // 文章标签
+  router.get('/allLable', ArticleLableController.allLable);
 };

@@ -29,7 +29,7 @@ export const reponseBody = (option = {}) => {
       };
     };
 
-    ctx.error = (count: number, row: any, size: number, page: any) => {
+    ctx.errorList = (count: number, row: any, size: number, page: any) => {
       ctx.body = {
         code: 403,
         msg: '成功',

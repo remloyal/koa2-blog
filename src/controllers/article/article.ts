@@ -1,10 +1,10 @@
 import { Context } from 'koa';
-import sequelize from '../entity/db';
-import Article from '../moudels/article/article';
+import sequelize from '../../entity/db';
+import Article from '../../moudels/article/article';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import { dateFormart, randomStr } from '../utils/util';
+import { dateFormart, randomStr } from '../../utils/util';
 
 // 文章分类
 export default class ArticleController {

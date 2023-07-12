@@ -1,5 +1,5 @@
 import { Context } from 'koa';
-import ArticleSort from '../moudels/article/article_sort';
+import ArticleSort from '../../moudels/article/article_sort';
 
 // 文章分类
 export default class ArticleSortController {

@@ -14,6 +14,12 @@ const sequelize = new Sequelize(sqlUrl, {
   logging: (manage) => {
     log4js.db(manage);
   },
+  pool: {
+    max: 5,
+    min: 0,
+    acquire: 30000,
+    idle: 10000,
+  },
 });
 
 // 测试数据库链接
