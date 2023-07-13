@@ -6,7 +6,7 @@ import dayjs from 'dayjs';
 const Tag = sequelize.define(
   'rem_tag',
   {
-    tag_id: { type: DataTypes.STRING, defaultValue: randomStr(), allowNull: true },
+    tag_id: { type: DataTypes.STRING, defaultValue: () => randomStr(), allowNull: true },
     tag_name: {
       type: DataTypes.STRING(55),
       allowNull: false,

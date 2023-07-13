@@ -67,6 +67,23 @@ app.on('close', (err, ctx) => {
   log4js.loggers.errLogger(err, ctx);
 });
 
+app.use(async (ctx, next) => {
+  try {
+    await next();
+    // 如果没有匹配到任何路由，则表示路由不存在
+    if (!ctx._matchedRoute) {
+      ctx.status = 404;
+      ctx.body = {
+        code: 404,
+        error: '该路由不存在',
+      };
+    }
+  } catch (error: any) {
+    ctx.status = error.code || error.status || 500;
+    ctx.body = { error: error.message };
+  }
+});
+
 app.use(publicRouter.routes()).use(publicRouter.allowedMethods()); // 公共路由
 app.use(privateRouter.routes()).use(privateRouter.allowedMethods()); // 私有路由
 

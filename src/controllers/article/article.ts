@@ -48,11 +48,11 @@ export default class ArticleController {
       const record = ctx.request.body;
       // 创建本地md文件
       const yyyyMM = dateFormart('yyyyMM'); // 目录： 年月日
-      const lastDir = path.join(__dirname, '../..', `public/markdown/${yyyyMM}`);
+      const lastDir = path.join(__dirname, '../../../', `public/markdown/${yyyyMM}`);
       await checkDirExist(lastDir); //code 检查文件夹是否存在如果不存在则新建文件夹
       const route = `/markdown/${yyyyMM}/` + record.name + '.md';
 
-      const filePath = path.join(__dirname, '../..', `public${route}`);
+      const filePath = path.join(__dirname, '../../../', `public${route}`);
       const state = await createMd(filePath, JSON.parse(record.content));
       if (state == true) {
         const data = await Article.create({

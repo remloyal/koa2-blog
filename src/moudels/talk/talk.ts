@@ -6,7 +6,7 @@ import dayjs from 'dayjs';
 const Talk = sequelize.define(
   'blog_talk',
   {
-    talk_id: { type: DataTypes.STRING, defaultValue: randomStr(), allowNull: true },
+    talk_id: { type: DataTypes.STRING, defaultValue: () => randomStr(), allowNull: true },
     content: {
       type: DataTypes.STRING(255),
       allowNull: true,

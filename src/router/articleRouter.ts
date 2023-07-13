@@ -1,7 +1,7 @@
 import { Context } from 'koa';
 import Router from 'koa-router';
 import ArticleController from '../controllers/article/article';
-import ArticleLableController from '../controllers/article/articleLable';
+import * as ArticleLableController from '../controllers/article/articleTag';
 import ArticleSortController from '../controllers/article/articleSort';
 
 export const articleRouter = (router: Router,privateRouter:Router) => {
@@ -40,5 +40,7 @@ export const articleRouter = (router: Router,privateRouter:Router) => {
   router.post('/updateSort', ArticleSortController.updateSort);
 
   // 文章标签
-  router.get('/allLable', ArticleLableController.allLable);
+  router.get('/allTag', ArticleLableController.allTag);
+  router.post('/addTag', ArticleLableController.addTag);
+  router.delete('/deleteTag', ArticleLableController.deleteTag);
 };
