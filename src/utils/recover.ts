@@ -8,6 +8,7 @@ import { Context, Next } from 'koa';
 export const reponseBody = (option = {}) => {
   return async (ctx: Context, next: Next) => {
     ctx.success = (data: any, message?: string) => {
+      ctx.status = 200;
       ctx.body = {
         data: data ?? null,
         code: 200,
@@ -16,6 +17,7 @@ export const reponseBody = (option = {}) => {
     };
 
     ctx.fail = (message?: string) => {
+      ctx.status = 400;
       ctx.body = {
         code: 400,
         msg: message || '数据请求失败',
@@ -23,13 +25,37 @@ export const reponseBody = (option = {}) => {
     };
 
     ctx.error = (message?: string) => {
+      ctx.status = 500;
       ctx.body = {
         code: 500,
         msg: message || '服务器异常',
       };
     };
 
+    ctx.absent = (message?: string) =>{
+      ctx.status = 200;
+      ctx.body = {
+        code: 403,
+        msg: message || '数据不存在或更新失败',
+      };
+    }
+    ctx.list = (count: number, row: any, size: number, page: any) => {
+      ctx.status = 200;
+      ctx.body = {
+        code: 200,
+        msg: '数据请求成功',
+        data: {
+          current: page,
+          pages: Math.ceil(count / size),
+          size: size,
+          total: count,
+          records: row,
+        },
+      };
+    };
+
     ctx.errorList = (count: number, row: any, size: number, page: any) => {
+      ctx.status = 403;
       ctx.body = {
         code: 403,
         msg: '成功',

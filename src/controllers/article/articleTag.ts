@@ -32,21 +32,80 @@ export const addTag = async (ctx: Context) => {
 // 根据id删除标签
 export const deleteTag = async (ctx: Context) => {
   const t = await sequelize.transaction();
-  const id = ctx.query.id;
+  const id: string = ctx.query.id as string;
   try {
-    const data = await Tag.findOne({
+    const ids = id.split(',');
+    const data = await Tag.destroy({
       where: {
-        tag_id: id,
+        tag_id: ids,
       },
     });
-    if (data) {
-      data.destroy();
+    if (data > 0) {
       await t.commit();
       ctx.success(null, '数据删除成功');
     } else {
       await t.rollback();
-      ctx.fail('数据删除失败');
+      ctx.absent();
     }
+  } catch (error) {
+    await t.rollback();
+    ctx.error(error);
+  }
+};
+
+// 分页查询标签
+export const queryTags = async (ctx: Context) => {
+  const record: { page: number; size: number } = ctx.request.body;
+  try {
+    const { count, rows } = await Tag.findAndCountAll({
+      // where: {
+      //   article_id: id,
+      // },
+      offset: (record.page - 1) * record.size,
+      limit: record.size,
+      attributes: {
+        exclude: ['id'], // 排除的字段名
+      },
+      // order: [['id']],
+    });
+    await ctx.list(count, rows, record.size, record.page);
+  } catch (error) {
+    ctx.error(error);
+  }
+};
+
+// 更新单个标签
+export const updateTag = async (ctx: Context) => {
+  const t = await sequelize.transaction();
+  const record: { tag_name: string; tag_describe?: string; id: string } = ctx.request.body;
+  try {
+    const updateObject: any = {
+      tag_name: record.tag_name,
+    };
+    if (record.tag_describe) {
+      updateObject.tag_describe = record.tag_describe;
+    }
+
+    const data = await Tag.findOne({
+      where: {
+        tag_id: record.id,
+      },
+    });
+    const [numAffectedRows, affectedRows] = await Tag.update(updateObject, {
+      where: {
+        tag_id: record.id,
+      },
+      returning: true, // 返回被更新的记录
+      transaction: t,
+    });
+    if (numAffectedRows == 0 || numAffectedRows == undefined) {
+      // 没有更新任何记录
+      await t.rollback();
+      return await ctx.absent('数据不存在或更新失败');
+    }
+
+    await t.commit();
+    await ctx.success(null, '数据更新成功');
   } catch (error) {
     await t.rollback();
     ctx.error(error);

@@ -43,4 +43,7 @@ export const articleRouter = (router: Router,privateRouter:Router) => {
   router.get('/allTag', ArticleLableController.allTag);
   router.post('/addTag', ArticleLableController.addTag);
   router.delete('/deleteTag', ArticleLableController.deleteTag);
+  router.post('/queryTags', ArticleLableController.queryTags);
+  router.post('/updateTag', ArticleLableController.updateTag);
+  
 };
