@@ -61,8 +61,8 @@ export const queryTags = async (ctx: Context) => {
       // where: {
       //   article_id: id,
       // },
-      offset: (record.page - 1) * record.size,
-      limit: record.size,
+      offset: ( Number(record.page) - 1) * Number(record.size),
+      limit: Number(record.size),
       attributes: {
         exclude: ['id'], // 排除的字段名
       },
@@ -76,38 +76,43 @@ export const queryTags = async (ctx: Context) => {
 
 // 更新单个标签
 export const updateTag = async (ctx: Context) => {
-  const t = await sequelize.transaction();
   const record: { tag_name: string; tag_describe?: string; id: string } = ctx.request.body;
   try {
+    const data = await Tag.findOne({
+      where: {
+        tag_id: record.id,
+      },
+    });
+
+    if (!data) {
+      return await ctx.absent('数据不存在');
+    }
     const updateObject: any = {
       tag_name: record.tag_name,
     };
     if (record.tag_describe) {
       updateObject.tag_describe = record.tag_describe;
     }
-
-    const data = await Tag.findOne({
-      where: {
-        tag_id: record.id,
-      },
-    });
-    const [numAffectedRows, affectedRows] = await Tag.update(updateObject, {
-      where: {
-        tag_id: record.id,
-      },
-      returning: true, // 返回被更新的记录
-      transaction: t,
-    });
-    if (numAffectedRows == 0 || numAffectedRows == undefined) {
-      // 没有更新任何记录
-      await t.rollback();
-      return await ctx.absent('数据不存在或更新失败');
+    let numAffectedRows, affectedRows;
+    try {
+      const t = await sequelize.transaction();
+      [numAffectedRows, affectedRows] = await Tag.update(updateObject, {
+        where: {
+          tag_id: record.id,
+        },
+        returning: true, // 返回被更新的记录
+        transaction: t,
+      });
+      await t.commit();
+    } catch (error) {
+      return await ctx.absent('数据更新失败');
+    }
+    if (numAffectedRows === 0 || !affectedRows) {
+      return await ctx.absent('数据更新失败');
     }
 
-    await t.commit();
     await ctx.success(null, '数据更新成功');
   } catch (error) {
-    await t.rollback();
     ctx.error(error);
   }
 };
