@@ -22,6 +22,11 @@ const sequelize = new Sequelize(sqlUrl, {
   },
 });
 
+const MAX_RETRIES = 20;  // 最大重试次数
+const RETRY_DELAY = 10000;  // 重试延迟时间（单位：毫秒）
+let retryCount = 0;
+const delay = (ms:number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 // 测试数据库链接
 export const dbtest = () => {
   sequelize
@@ -40,11 +45,19 @@ export const dbtest = () => {
         });
       console.log('数据库连接成功');
     })
-    .catch((err: any) => {
+    .catch(async (err: any) => {
       // 数据库连接失败时打印输出
       log4js.db(`数据库连接失败====> ${err}`);
       console.error('数据库连接失败====>', err);
-      throw err;
+      if (retryCount < MAX_RETRIES) {
+        retryCount++;
+        console.log('等待重试...');
+        await delay(RETRY_DELAY);
+        console.log(`第 ${retryCount} 次重试`);
+        await dbtest();  // 递归调用进行重连
+      } else {
+        throw new Error('达到最大重试次数，无法连接数据库');
+      }
     });
 };
 
