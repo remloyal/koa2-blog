@@ -1,5 +1,5 @@
 import { Context } from 'koa';
-import sequelize from '../../entity/db';
+import { sequelize } from '../../entity/db';
 import { Lable, Tag } from '../../moudels/article/lables';
 
 // 文章标签

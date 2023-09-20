@@ -74,8 +74,8 @@ log4js.configure({
     // 响应日志
     response: {
       type: 'dateFile',
-      // category: 'resLogger',
-      filename: path.join('logs/', 'responses/response'),
+      // category:'resLogger',
+      filename: path.join('logs/','responses/response'),
       pattern: 'yyyy-MM-dd.log', //日志输出模式
       alwaysIncludePattern: true,
       maxLogSize: logSize,

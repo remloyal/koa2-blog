@@ -1,4 +1,4 @@
-import sequelize from '../../entity/db';
+import { sequelize } from '../../entity/db';
 import { Model, DataTypes } from 'sequelize';
 const { STRING, INTEGER } = DataTypes; // 获取数据类型
 

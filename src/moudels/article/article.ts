@@ -1,4 +1,4 @@
-import sequelize from '../../entity/db';
+import { sequelize } from '../../entity/db';
 import { Model, DataTypes } from 'sequelize';
 import { randomStr } from '../../utils/util';
 import dayjs from 'dayjs';

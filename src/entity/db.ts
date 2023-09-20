@@ -9,7 +9,7 @@ const sqlUrl =
     : `${FIXED_KEY.sql.type}://${FIXED_KEY.sql.username}:${FIXED_KEY.sql.password}@${FIXED_KEY.sql.host}:${FIXED_KEY.sql.port}/${FIXED_KEY.sql.database}`;
 console.log(sqlUrl);
 
-const sequelize = new Sequelize(sqlUrl, {
+export const sequelize = new Sequelize(sqlUrl, {
   timezone: '+08:00',
   logging: (manage) => {
     log4js.db(manage);
@@ -60,5 +60,3 @@ export const dbtest = () => {
       }
     });
 };
-
-export default sequelize;

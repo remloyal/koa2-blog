@@ -1,5 +1,5 @@
 import { Context } from 'koa';
-import sequelize from '../../entity/db';
+import { sequelize } from '../../entity/db';
 import Article from '../../moudels/article/article';
 import fs from 'fs';
 import os from 'os';

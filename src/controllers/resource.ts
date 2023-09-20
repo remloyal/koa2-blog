@@ -5,7 +5,7 @@ import { dateFormart, randomStr } from '../utils/util';
 import { FileControl, FileControlAttributes } from '../moudels/resources/resource';
 import os from 'os';
 import { Model } from 'sequelize';
-import sequelize from '../entity/db';
+import { sequelize } from '../entity/db';
 const mime = require('mime-types');
 
 type filesitemtype = {
